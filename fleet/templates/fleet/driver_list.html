@@ -1,0 +1,30 @@
+{% extends 'fleet/base.html' %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Справочник водителей</h2>
+        <a href="{% url 'driver_create' %}" class="btn btn-primary">Добавить водителя</a>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ФИО</th>
+            <th>Контакты</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for driver in drivers %}
+            <tr>
+                <td>{{ driver.last_name }} {{ driver.first_name }} {{ driver.middle_name|default:"" }}</td>
+                <td>{{ driver.contact_info }}</td>
+                <td>
+                    <a href="{% url 'driver_edit' driver.pk %}" class="btn btn-sm btn-outline-secondary">Ред.</a>
+                    <a href="{% url 'driver_delete' driver.pk %}" class="btn btn-danger btn-sm">Удалить</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'fleet/base.html' %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3>Путевой лист № {{ log.log_number }}</h3>
+            <a href="{% url 'log_list' %}" class="btn btn-secondary">Назад к журналу</a>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <strong>Общие сведения</strong>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Автомобиль:</strong><br>
+                        {{ log.automobile.make }} {{ log.automobile.model }} ({{ log.automobile.license_plate }})
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Водитель:</strong><br>
+                        {{ log.driver.last_name }} {{ log.driver.first_name }} {{ log.driver.middle_name|default:"" }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Период поездки:</strong><br>
+                        {{ log.start_date|date:"d.m.Y" }} — {{ log.end_date|date:"d.m.Y" }}
+                    </div>
+                </div>
+
+                <table class="table table-bordered mt-3">
+                    <thead class="table-secondary">
+                    <tr>
+                        <th colspan="2">Работа водителя и автомобиля</th>
+                        <th colspan="2">Движение горючего (литры)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><strong>Выезд:</strong></td>
+                        <td>{{ log.start_date|date:"d.m.Y" }} в {{ log.departure_time|time:"H:i" }}</td>
+                        <td>Остаток при выезде:</td>
+                        <td>{{ log.fuel_balance_start }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Возвращение:</strong></td>
+                        <td>{{ log.end_date|date:"d.m.Y" }} в {{ log.return_time|time:"H:i" }}</td>
+                        <td>Выдано:</td>
+                        <td>{{ log.fuel_issued }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Спидометр (выезд):</strong></td>
+                        <td>{{ log.start_mileage }} км</td>
+                        <td>Остаток при возвращении:</td>
+                        <td>{{ log.fuel_balance_end }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Спидометр (возврат):</strong></td>
+                        <td>{{ log.end_mileage }} км</td>
+                        <td><strong>Фактический расход:</strong></td>
+                        <td><strong>{{ log.actual_fuel|floatformat:2 }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Пройдено:</strong></td>
+                        <td><strong>{{ log.distance_traveled }} км</strong></td>
+                        <td>Нормативный расход:</td>
+                        <td>{{ log.normative_fuel|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"></td>
+                        <td><strong>Результат (Эк./Пер.):</strong></td>
+                        <td class="{% if log.economy_overrun >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            <strong>{{ log.economy_overrun|floatformat:2 }}</strong>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <div class="mt-4">
+                    <h5>Маршрут следования</h5>
+                    <div class="p-3 bg-light border rounded">
+                        {{ log.route|linebreaks }}
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-muted text-end">
+                Документ сформирован системой учета автопарка
+            </div>
+        </div>
+    </div>
+{% endblock %}

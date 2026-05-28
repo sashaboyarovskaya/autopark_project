@@ -1,0 +1,20 @@
+{% extends 'fleet/base.html' %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">Удаление водителя</div>
+                <div class="card-body">
+                    <p>Вы действительно хотите удалить водителя <strong>{{ driver }}</strong>?</p>
+                    <p class="text-muted">Это может повлиять на связанные путевые листы.</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Да, удалить</button>
+                        <a href="{% url 'driver_list' %}" class="btn btn-secondary">Отмена</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

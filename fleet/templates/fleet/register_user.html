@@ -1,0 +1,12 @@
+{% extends 'fleet/base.html' %}
+
+{% block content %}
+    <h2>Регистрация нового сотрудника</h2>
+    <div class="card p-4 shadow-sm col-md-6">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-warning mt-3">Сохранить изменения</button>
+        </form>
+    </div>
+{% endblock %}

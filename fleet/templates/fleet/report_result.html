@@ -1,0 +1,124 @@
+{% extends 'fleet/base.html' %}
+
+{% block content %}
+    <style>
+        @media print {
+            nav, .no-print {
+                display: none !important;
+            }
+
+            .container {
+                max_width: 100%;
+            }
+
+            .card {
+                border: 1px solid #000 !important;
+            }
+
+            .bg-primary, .bg-secondary, .bg-warning, .bg-success {
+                background-color: #fff !important;
+                color: #000 !important;
+                border: 1px solid #000 !important;
+            }
+
+            h2, h3, h4 {
+                color: #000 !important;
+            }
+
+            .text-success, .text-danger {
+                color: #000 !important;
+            }
+        }
+    </style>
+
+    <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+        <h2>Результат отчета</h2>
+        <div>
+            <button class="btn btn-success me-2" onclick="window.print()">🖨️ Печать / PDF</button>
+            <a href="{% url 'reports_selection' %}" class="btn btn-secondary">← Назад к фильтрам</a>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <h4>Отчет по эксплуатации автотранспорта</h4>
+        <p>
+            Период:
+            {% if date_from %}{{ date_from|date:"d.m.Y" }}{% else %}Начало{% endif %}
+            —
+            {% if date_to %}{{ date_to|date:"d.m.Y" }}{% else %}Конец{% endif %}
+        </p>
+    </div>
+
+    <div class="row text-center mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">Общий пробег</div>
+                <div class="card-body">
+                    <h3>{{ total_distance }} км</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-secondary">
+                <div class="card-header bg-secondary text-white">Норма расхода</div>
+                <div class="card-body">
+                    <h3>{{ total_fuel_norm }} л</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">Факт. расход</div>
+                <div class="card-body">
+                    <h3>{{ total_fuel_actual }} л</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">Итого (Эк./Пер.)</div>
+                <div class="card-body">
+                    <h3>{{ economy }} л</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4>Детализация</h4>
+    <table class="table table-sm table-hover table-bordered">
+        <thead class="table-light">
+        <tr>
+            <th>Дата</th>
+            <th>Автомобиль</th>
+            <th>Водитель</th>
+            <th>Пробег (км)</th>
+            <th>Норма (л)</th>
+            <th>Факт (л)</th>
+            <th>Итог (л)</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for log in logs %}
+            <tr>
+                <td>{{ log.start_date|date:"d.m.Y" }}</td>
+                <td>{{ log.automobile.license_plate }}</td>
+                <td>{{ log.driver.last_name }}</td>
+                <td>{{ log.distance_traveled|floatformat:1 }}</td>
+                <td>{{ log.normative_fuel|floatformat:1 }}</td>
+                <td>{{ log.actual_fuel|floatformat:1 }}</td>
+                <td class="{% if log.economy_overrun >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    {{ log.economy_overrun|floatformat:2 }}
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="7" class="text-center">Данные отсутствуют</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="mt-4 text-end text-muted no-print">
+        <small>Система учета автопарка</small>
+    </div>
+{% endblock %}

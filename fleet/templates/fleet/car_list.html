@@ -1,0 +1,49 @@
+{% extends 'fleet/base.html' %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Справочник автомобилей</h2>
+        <a href="{% url 'car_create' %}" class="btn btn-primary">Добавить ТС</a>
+    </div>
+
+    <form method="get" class="mb-4 d-flex">
+        <input type="text" name="q" class="form-control me-2" placeholder="Поиск по гос. номеру..."
+               value="{{ query|default:'' }}">
+        <button type="submit" class="btn btn-primary me-2">Найти</button>
+        <a href="{% url 'car_list' %}" class="btn btn-secondary">Сброс</a>
+    </form>
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>Марка/Модель</th>
+            <th>Гос. номер</th>
+            <th>Текущий пробег</th>
+            <th>Норма расхода</th>
+            <th>Техосмотр до</th>
+            <th>Страховка до</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for car in cars %}
+            <tr class="{% if car.is_inspection_due or car.is_insurance_due %}table-danger{% endif %}">
+                <td>{{ car.make }} {{ car.model }}</td>
+                <td>{{ car.license_plate }}</td>
+                <td>{{ car.current_mileage }} км</td>
+                <td>{{ car.fuel_consumption_rate }} л/100км</td>
+                <td>{{ car.inspection_due_date }}</td>
+                <td>{{ car.insurance_due_date }}</td>
+                <td>
+                    <a href="{% url 'car_edit' car.pk %}" class="btn btn-sm btn-outline-secondary">Ред.</a>
+                    <a href="{% url 'car_delete' car.pk %}" class="btn btn-danger btn-sm">Удалить</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="7" class="text-center">Автомобили не найдены</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

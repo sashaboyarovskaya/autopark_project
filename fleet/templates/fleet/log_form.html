@@ -1,0 +1,104 @@
+{% extends 'fleet/base.html' %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+    <div class="alert alert-info">
+        Система автоматически рассчитает расход топлива. Начальный пробег загружается при выборе автомобиля.
+    </div>
+
+    <div class="card p-4 shadow-sm">
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    Пожалуйста, исправьте ошибки ниже.
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Основное</h4>
+                    {{ form.log_number.label_tag }} {{ form.log_number }}
+                    <div class="mb-2"></div>
+                    {{ form.automobile.label_tag }} {{ form.automobile }}
+                    <div class="mb-2"></div>
+                    {{ form.driver.label_tag }} {{ form.driver }}
+                </div>
+                <div class="col-md-6">
+                    <h4>Время поездки</h4>
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <label>Дата выезда</label>
+                            {{ form.start_date }}
+                        </div>
+                        <div class="col-6">
+                            <label>Время выезда</label>
+                            {{ form.departure_time }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label>Дата возвращения</label>
+                            {{ form.end_date }}
+                        </div>
+                        <div class="col-6">
+                            <label>Время возвращения</label>
+                            {{ form.return_time }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Пробег (км)</h4>
+                    {{ form.start_mileage.label_tag }} {{ form.start_mileage }}
+                    {{ form.end_mileage.label_tag }} {{ form.end_mileage }}
+                    <div class="text-danger">{{ form.end_mileage.errors }}</div>
+                </div>
+                <div class="col-md-6">
+                    <h4>Топливо (л)</h4>
+                    {{ form.fuel_balance_start.label_tag }} {{ form.fuel_balance_start }}
+                    {{ form.fuel_issued.label_tag }} {{ form.fuel_issued }}
+                    {{ form.fuel_balance_end.label_tag }} {{ form.fuel_balance_end }}
+                </div>
+            </div>
+
+            <div class="mt-3">
+                {{ form.route.label_tag }} {{ form.route }}
+            </div>
+
+            <button type="submit" class="btn btn-success mt-4 w-100">Рассчитать и Сохранить</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const autoSelect = document.getElementById('id_automobile');
+            const startMileageInput = document.getElementById('id_start_mileage');
+
+            if (autoSelect) {
+                autoSelect.addEventListener('change', function () {
+                    const carId = this.value;
+                    if (carId) {
+                        fetch(`/cars/api/get_mileage/${carId}/`)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                startMileageInput.value = data.current_mileage;
+                            })
+                            .catch(error => console.error('Error fetching mileage:', error));
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

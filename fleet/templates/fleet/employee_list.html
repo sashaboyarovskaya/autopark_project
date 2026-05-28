@@ -1,0 +1,54 @@
+{% extends 'fleet/base.html' %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Сотрудники предприятия</h2>
+        <a href="{% url 'register_user' %}" class="btn btn-primary">Добавить сотрудника</a>
+    </div>
+
+    <table class="table table-hover table-bordered">
+        <thead class="table-dark">
+        <tr>
+            <th>Логин</th>
+            <th>ФИО</th>
+            <th>Роль</th>
+            <th>Телефон</th>
+            <th>Почта</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for emp in employees %}
+            <tr>
+                <td>{{ emp.username }}</td>
+                <td>
+                    {{ emp.last_name }} {{ emp.first_name }}
+                    {% if emp.profile.middle_name %}{{ emp.profile.middle_name }}{% endif %}
+                </td>
+                <td>
+                    {% for group in emp.groups.all %}
+                        <span class="badge bg-info text-dark">
+                        {% if group.name == 'Administrator' %}Администратор{% endif %}
+                            {% if group.name == 'Mechanic' %}Механик{% endif %}
+                            {% if group.name == 'Dispatcher' %}Диспетчер{% endif %}
+                            {% if group.name == 'Accountant' %}Бухгалтер{% endif %}
+                    </span>
+                    {% empty %}
+                        <span class="badge bg-secondary">Без роли</span>
+                    {% endfor %}
+                </td>
+                <td>{{ emp.profile.phone_number }}</td>
+                <td>{{ emp.email }}</td>
+                <td>
+                    {% if not emp.is_superuser %}
+                        <a href="{% url 'employee_edit' emp.pk %}" class="btn btn-warning btn-sm">Ред.</a>
+                        <a href="{% url 'employee_delete' emp.pk %}" class="btn btn-danger btn-sm">Удалить</a>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">Админ</span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

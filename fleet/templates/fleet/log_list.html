@@ -1,0 +1,45 @@
+{% extends 'fleet/base.html' %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Журнал путевых листов</h2>
+        <a href="{% url 'log_create' %}" class="btn btn-success">Создать путевой лист</a>
+    </div>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+        <tr>
+            <th>Дата</th>
+            <th>№ Листа</th>
+            <th>Автомобиль</th>
+            <th>Водитель</th>
+            <th>Пробег (км)</th>
+            <th>Расход (л)</th>
+            <th>Экономия / Перерасход (л)</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for log in logs %}
+            <tr>
+                <td>
+                    <div>{{ log.start_date|date:"d.m.Y" }} - {{ log.end_date|date:"d.m.Y" }}</div>
+                    <small class="text-muted">{{ log.departure_time|time:"H:i" }}
+                        - {{ log.return_time|time:"H:i" }}</small>
+                </td>
+                <td>{{ log.log_number }}</td>
+                <td>{{ log.automobile.license_plate }}</td>
+                <td>{{ log.driver.last_name }} {{ log.driver.first_name|slice:":1" }}.</td>
+                <td>{{ log.distance_traveled|floatformat:1 }}</td>
+                <td>{{ log.actual_fuel|floatformat:1 }}</td>
+                <td class="{% if log.economy_overrun >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    {{ log.economy_overrun|floatformat:2 }}
+                </td>
+                <td>
+                    <a href="{% url 'log_detail' log.pk %}" class="btn btn-info btn-sm" title="Просмотр">Просмотр</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
